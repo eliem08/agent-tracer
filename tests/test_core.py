@@ -1,3 +1,4 @@
+import contextlib
 import os
 import tempfile
 import unittest
@@ -18,10 +19,8 @@ class Tests(unittest.TestCase):
             with tr.span("agent", kind="agent"):
                 with tr.span("plan", kind="llm", model="claude-sonnet-x", input_tokens=1_000_000, output_tokens=0):
                     pass
-                try:
+                with contextlib.suppress(RuntimeError):
                     boom()
-                except RuntimeError:
-                    pass
             spans = load(path)
             self.assertEqual(len(spans), 3)
             root = [s for s in spans if s["parent_id"] is None]

@@ -4,7 +4,7 @@ import sys
 
 from .core import build_tree, load, stats
 
-ICONS = {"agent": "◆", "llm": "✦", "tool": "⚙", "retrieval": "⌕", "step": "•"}
+ICONS = {"agent": "[A]", "llm": "[L]", "tool": "[T]", "retrieval": "[R]", "step": "[.]"}
 
 
 def _print(node, depth, t0):
@@ -17,7 +17,9 @@ def _print(node, depth, t0):
     if node.get("status") == "error":
         extra.append(f"ERROR {node.get('error', '')}")
     offset = (node["start"] - t0) * 1000
-    print(f"{'  ' * depth}{ICONS.get(node['kind'], '•')} {node['name']:<{max(1, 40 - 2 * depth)}} +{offset:8.1f}ms {node.get('duration_ms', 0):9.1f}ms  {' '.join(extra)}")
+    print(
+        f"{'  ' * depth}{ICONS.get(node['kind'], '[.]')} {node['name']:<{max(1, 40 - 2 * depth)}} +{offset:8.1f}ms {node.get('duration_ms', 0):9.1f}ms  {' '.join(extra)}"
+    )
     for c in node["children"]:
         _print(c, depth + 1, t0)
 
@@ -41,7 +43,9 @@ def main(argv=None):
     if a.json:
         print(json.dumps(st, indent=2))
         return 0
-    print(f"{st['spans']} spans | errors {st['errors']} ({st['error_rate']:.1%}) | tokens {st['tokens']:,} | cost ${st['cost_usd']:.4f}")
+    print(
+        f"{st['spans']} spans | errors {st['errors']} ({st['error_rate']:.1%}) | tokens {st['tokens']:,} | cost ${st['cost_usd']:.4f}"
+    )
     for k, v in st["by_kind"].items():
         print(f"  {k:<10} {v['count']:>5} spans {v['ms']:>10.1f} ms")
     print("slowest: " + ", ".join(f"{n} ({ms:.0f}ms)" for n, ms in st["slowest"]))
