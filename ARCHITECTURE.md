@@ -49,4 +49,4 @@ SDK overhead under 50 µs per span. Ingest-to-query p95 under 10 s.
 
 ## 8. Risks
 Crowded market (LangSmith, Langfuse, Arize). The differentiators are zero-dependency adoption, cost
-budgets that act (agent-okta revoke), and replay for non-engineers.
+budgets that act (agentwarden revoke), and replay for non-engineers.

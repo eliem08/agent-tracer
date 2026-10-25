@@ -1,14 +1,44 @@
-# agent-tracer
+<!-- sell-kit:start -->
+# Agent Tracer
 
 [![CI](https://github.com/eliem08/agent-tracer/actions/workflows/ci.yml/badge.svg)](https://github.com/eliem08/agent-tracer/actions/workflows/ci.yml)
 
-> **Datadog for agents** — see every step your agents took.
+> **See every step your agents took, what it cost and where it broke.**
 
-When an agent run goes sideways you need to know: which tool call failed,
-which LLM call burned $4 of tokens, where the 90 seconds went. `agent-tracer`
-is a zero-dependency tracing SDK + CLI built for agent workloads.
+**Who it's for:** Teams running LLM agents in production.
 
-## What the MVP does
+**The problem:** When an agent fails or burns money, there is no trace of which step, tool or model call caused it.
+
+**What you get:** A zero-dependency tracing SDK that records spans, cost, tokens and errors, with tree and stats views from the command line.
+
+## Quickstart
+
+Customers receive a release archive with the wheel and the examples. Python 3.10+ and no other dependencies.
+
+```bash
+pip install agent_tracer-0.1.0-py3-none-any.whl
+agent-tracer tree examples/trace.jsonl
+agent-tracer stats examples/trace.jsonl
+```
+
+## Pricing
+
+Every plan starts with a 14-day free trial. Prices in USD, billed monthly unless noted.
+
+| Plan | Price | Includes |
+|---|---|---|
+| **Developer** | Free for 1 developer | Local tracing; Tree and stats views; Community support |
+| **Team** | $99 per month | 10 developers; Cost and error dashboards; Trace export |
+| **Business** | $499 per month | Unlimited developers; Retention controls; Priority support |
+
+To start a trial or buy a plan, email **sales@YOUR-DOMAIN.com**.
+
+## Licence
+
+Proprietary. Copyright (c) 2026 eliem08. All rights reserved. Use requires a paid plan or an active trial; see [LICENSE](LICENSE).
+<!-- sell-kit:end -->
+
+## What it does
 
 - **SDK**: nested spans via a context manager or decorator, automatically
   parented with `contextvars` (works across async too)

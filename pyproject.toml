@@ -5,16 +5,17 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "agent-tracer"
 version = "0.1.0"
-description = "Datadog for agents: see every step your agents took"
+description = "See every step your agents took, what it cost and where it broke."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = { text = "Proprietary" }
 authors = [{ name = "eliem08" }]
 dependencies = []
 classifiers = [
   "Programming Language :: Python :: 3",
-  "License :: OSI Approved :: MIT License",
+  "License :: Other/Proprietary License",
   "Operating System :: OS Independent",
+  "Private :: Do Not Upload",
 ]
 
 [project.optional-dependencies]
