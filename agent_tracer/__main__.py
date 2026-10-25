@@ -26,13 +26,18 @@ def _print(node, depth, t0):
         _print(c, depth + 1, t0)
 
 
-def _run(argv=None):
+def build_parser():
     ap = argparse.ArgumentParser(prog="agent-tracer")
     sub = ap.add_subparsers(dest="cmd", required=True)
     for name in ("tree", "stats"):
         p = sub.add_parser(name)
         p.add_argument("file")
         p.add_argument("--json", action="store_true")
+    return ap
+
+
+def _run(argv=None):
+    ap = build_parser()
     a = ap.parse_args(argv)
     spans = load(a.file)
     if a.cmd == "tree":

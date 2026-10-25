@@ -23,6 +23,7 @@ dev = ["ruff>=0.6"]
 
 [project.scripts]
 agent-tracer = "agent_tracer.__main__:main"
+agent-tracer-web = "agent_tracer.web:main"
 
 [project.urls]
 Repository = "https://github.com/eliem08/agent-tracer"
