@@ -87,7 +87,10 @@ class Tracer:
 
 def load(path: str) -> list[dict]:
     with open(path, encoding="utf-8-sig") as fh:
-        return [json.loads(l) for l in fh if l.strip()]
+        rows = [json.loads(l) for l in fh if l.strip()]
+    if not all(isinstance(r, dict) for r in rows):
+        raise ValueError(f"{path}: expected one JSON object per line")
+    return rows
 
 
 def build_tree(spans: list[dict]) -> dict[str, list[dict]]:
