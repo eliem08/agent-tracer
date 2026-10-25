@@ -46,7 +46,7 @@ Every plan starts with a 14-day free trial. Prices in USD, billed monthly unless
 | **Team** | $99 per month | 10 developers; Cost and error dashboards; Trace export |
 | **Business** | $499 per month | Unlimited developers; Retention controls; Priority support |
 
-To start a trial or buy a plan, email **sales@YOUR-DOMAIN.com**.
+To start a trial or buy a plan, [request access](https://github.com/eliem08/agent-tracer/issues/new?title=Agent%20Tracer%20trial&labels=sales).
 
 ## Licence
 
