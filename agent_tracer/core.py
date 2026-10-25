@@ -86,7 +86,7 @@ class Tracer:
 
 
 def load(path: str) -> list[dict]:
-    with open(path, encoding="utf-8") as fh:
+    with open(path, encoding="utf-8-sig") as fh:
         return [json.loads(l) for l in fh if l.strip()]
 
 
