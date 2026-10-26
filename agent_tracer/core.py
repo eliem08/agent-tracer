@@ -10,7 +10,7 @@ import uuid
 from collections import defaultdict
 from contextlib import contextmanager
 
-__all__ = ["Tracer", "MODEL_PRICES", "load", "build_tree", "stats"]
+__all__ = ["Tracer", "MODEL_PRICES", "load", "from_otlp", "build_tree", "stats"]
 
 # USD per million tokens (input, output) - placeholder price table, edit to taste.
 MODEL_PRICES = {
@@ -27,10 +27,12 @@ _current = contextvars.ContextVar("agent_tracer_span", default=None)
 def _price(model, tin, tout):
     if not model:
         return 0.0
-    for name, (pi, po) in MODEL_PRICES.items():
-        if model.startswith(name):
-            return (tin or 0) / 1e6 * pi + (tout or 0) / 1e6 * po
-    return 0.0
+    # longest prefix wins, so "gpt-4o-mini" is never billed at the "gpt-4o" rate
+    matches = [name for name in MODEL_PRICES if model.startswith(name)]
+    if not matches:
+        return 0.0
+    pi, po = MODEL_PRICES[max(matches, key=len)]
+    return (tin or 0) / 1e6 * pi + (tout or 0) / 1e6 * po
 
 
 class Tracer:
@@ -86,11 +88,80 @@ class Tracer:
 
 
 def load(path: str) -> list[dict]:
+    """Read spans from our JSONL format or an OpenTelemetry OTLP/JSON export (one or many documents)."""
     with open(path, encoding="utf-8-sig") as fh:
-        rows = [json.loads(l) for l in fh if l.strip()]
-    if not all(isinstance(r, dict) for r in rows):
+        text = fh.read()
+    try:
+        docs = [json.loads(text)]  # a single (possibly pretty-printed) OTLP document
+    except ValueError:
+        docs = [json.loads(line) for line in text.splitlines() if line.strip()]
+    if not all(isinstance(r, dict) for r in docs):
         raise ValueError(f"{path}: expected one JSON object per line")
+    rows = []
+    for doc in docs:
+        rows.extend(from_otlp(doc) if "resourceSpans" in doc else [doc])
     return rows
+
+
+# OpenTelemetry GenAI semantic conventions -> our span kinds
+_OTEL_KINDS = {
+    "chat": "llm",
+    "text_completion": "llm",
+    "generate_content": "llm",
+    "embeddings": "retrieval",
+    "execute_tool": "tool",
+    "invoke_agent": "agent",
+    "create_agent": "agent",
+}
+
+
+def _otel_value(v: dict):
+    for k in ("stringValue", "boolValue", "doubleValue"):
+        if k in v:
+            return v[k]
+    if "intValue" in v:
+        return int(v["intValue"])
+    return None
+
+
+def from_otlp(doc: dict) -> list[dict]:
+    """Convert an OTLP/JSON trace export (collector file exporter, Jaeger/Tempo download) into spans."""
+    out = []
+    for rs in doc.get("resourceSpans", []):
+        for ss in rs.get("scopeSpans", rs.get("instrumentationLibrarySpans", [])):
+            for sp in ss.get("spans", []):
+                attrs = {a["key"]: _otel_value(a.get("value", {})) for a in sp.get("attributes", [])}
+                start = int(sp.get("startTimeUnixNano", 0)) / 1e9
+                end = int(sp.get("endTimeUnixNano", 0)) / 1e9 or start
+                op = attrs.get("gen_ai.operation.name")
+                mine = {
+                    "model": attrs.get("gen_ai.request.model") or attrs.get("gen_ai.response.model"),
+                    "input_tokens": attrs.get("gen_ai.usage.input_tokens") or attrs.get("gen_ai.usage.prompt_tokens"),
+                    "output_tokens": attrs.get("gen_ai.usage.output_tokens")
+                    or attrs.get("gen_ai.usage.completion_tokens"),
+                }
+                mine = {k: v for k, v in mine.items() if v is not None}
+                if mine.get("model"):
+                    cost = _price(mine["model"], mine.get("input_tokens"), mine.get("output_tokens"))
+                    mine["cost_usd"] = round(cost, 6)
+                status = sp.get("status", {})
+                failed = status.get("code") in (2, "STATUS_CODE_ERROR")
+                span = {
+                    "trace_id": sp.get("traceId", ""),
+                    "span_id": sp.get("spanId", ""),
+                    "parent_id": sp.get("parentSpanId") or None,
+                    "name": sp.get("name", "?"),
+                    "kind": _OTEL_KINDS.get(op, "tool" if attrs.get("gen_ai.tool.name") else "step"),
+                    "start": start,
+                    "end": end,
+                    "duration_ms": round((end - start) * 1000, 3),
+                    "attrs": {**attrs, **mine},
+                    "status": "error" if failed else "ok",
+                }
+                if failed:
+                    span["error"] = status.get("message") or "error"
+                out.append(span)
+    return out
 
 
 def build_tree(spans: list[dict]) -> dict[str, list[dict]]:
