@@ -55,15 +55,18 @@ Buyers pick a plan on `/pricing`, pay on Stripe Checkout and see their API key o
 
 ## Pricing
 
-Every plan starts with a 14-day free trial. Prices in USD, billed monthly unless noted.
+Monthly plans start with a 14-day free trial. Prices in USD, billed monthly unless noted.
 
 | Plan | Price | Includes |
 |---|---|---|
 | **Developer** | Free for 1 developer | Local tracing; Tree and stats views; Community support |
-| **Team** | $99 per month | 10 developers; Cost and error dashboards; Trace export |
-| **Business** | $499 per month | Unlimited developers; Retention controls; Priority support |
+| **Team** | $99 per month | 10 developers; Cost and error statistics; OpenTelemetry import; JSON export |
+| **Business** | $499 per month | Unlimited developers; Hosted API; Priority support |
 
 To start a trial or buy a plan, [request access](https://github.com/eliem08/agent-tracer/issues/new?title=Agent%20Tracer%20trial&labels=sales).
+
+Plan note: every plan runs the same software, and every API key unlocks all of it. Seat, agent and volume
+limits are licence terms; the code does not enforce them. Support, SLA and done-for-you items are services.
 
 ## Licence
 
