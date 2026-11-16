@@ -65,4 +65,24 @@ SPEC = {
             "id": "stats",
         },
     ],
+    "plans": [
+        {
+            "key": "developer",
+            "name": "Developer",
+            "price": "Free for 1 developer",
+            "features": ["Local tracing", "Tree and stats views", "Community support"],
+        },
+        {
+            "key": "team",
+            "name": "Team",
+            "price": "$99 per month",
+            "features": ["10 developers", "Cost and error statistics", "OpenTelemetry import", "JSON export"],
+        },
+        {
+            "key": "business",
+            "name": "Business",
+            "price": "$499 per month",
+            "features": ["Unlimited developers", "Hosted API", "Priority support"],
+        },
+    ],
 }
