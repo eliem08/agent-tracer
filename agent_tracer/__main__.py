@@ -5,6 +5,7 @@ import os
 import sys
 
 from .core import build_tree, load, stats
+from .dashboard import render
 
 ICONS = {"agent": "[A]", "llm": "[L]", "tool": "[T]", "retrieval": "[R]", "step": "[.]"}
 
@@ -33,6 +34,10 @@ def build_parser():
         p = sub.add_parser(name)
         p.add_argument("file")
         p.add_argument("--json", action="store_true")
+    d = sub.add_parser("dashboard", help="write a one-file HTML dashboard (timeline, cost by model, errors)")
+    d.add_argument("file")
+    d.add_argument("out", help="HTML file to write")
+    d.add_argument("--title", default="Agent traces")
     return ap
 
 
@@ -40,6 +45,11 @@ def _run(argv=None):
     ap = build_parser()
     a = ap.parse_args(argv)
     spans = load(a.file)
+    if a.cmd == "dashboard":
+        with open(a.out, "w", encoding="utf-8") as fh:
+            fh.write(render(spans, a.title))
+        print(f"wrote {a.out}: {len(spans)} spans")
+        return 0
     if a.cmd == "tree":
         for trace_id, roots in build_tree(spans).items():
             print(f"trace {trace_id}")

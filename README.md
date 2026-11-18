@@ -9,7 +9,7 @@
 
 **The problem:** When an agent fails or burns money, there is no trace of which step, tool or model call caused it.
 
-**What you get:** A zero-dependency tracing SDK that records spans, cost, tokens and errors, with tree and stats views from the command line.
+**What you get:** A zero-dependency tracing SDK that records spans, cost, tokens and errors, with tree and stats views and a one-file HTML dashboard.
 
 ## Quickstart
 
@@ -34,7 +34,7 @@ docker build -t agent-tracer . && docker run -p 8000:8000 -e API_KEYS=sk_... -v 
 
 Every API call needs `Authorization: Bearer <key>` once any key exists; a server on a public address refuses to start without one. Calls are rate-limited per key (60/min, `--rate`) and metered: `agent-tracer-web usage` prints calls per key for billing.
 
-Endpoints: `POST /api/tree`, `POST /api/stats`, plus `GET /healthz` and `GET /api/spec` (machine-readable field list).
+Endpoints: `POST /api/tree`, `POST /api/stats`, `POST /api/dashboard`, plus `GET /healthz` and `GET /api/spec` (machine-readable field list).
 Files are sent as `{"name": ..., "content": ...}`, folders as `{"files": [...]}` or a base64 zip.
 
 ## Deploy and sell
@@ -61,7 +61,7 @@ Monthly plans start with a 14-day free trial. Prices in USD, billed monthly unle
 | Plan | Price | Includes |
 |---|---|---|
 | **Developer** | Free for 1 developer | Local tracing; Tree and stats views; Community support |
-| **Team** | $99 per month | 10 developers; Cost and error statistics; OpenTelemetry import; JSON export |
+| **Team** | $99 per month | 10 developers; HTML dashboard; Cost and error statistics; OpenTelemetry import; JSON export |
 | **Business** | $499 per month | Unlimited developers; Hosted API; Priority support |
 
 To start a trial or buy a plan, [request access](https://github.com/eliem08/agent-tracer/issues/new?title=Agent%20Tracer%20trial&labels=sales).
@@ -86,6 +86,8 @@ Proprietary. Copyright (c) 2026 eliem08. All rights reserved. Use requires a pai
 - **CLI**:
   - `tree` — waterfall view of a trace with durations, costs, errors
   - `stats` — totals per kind / per tool / per model, slowest spans, error rate
+  - `dashboard` — one HTML file with totals, a timeline per trace, cost by model, errors and the slowest
+    steps; no JavaScript, works offline, safe to attach to a ticket ([example](examples/dashboard.html))
 
 ## Quickstart
 
@@ -107,6 +109,7 @@ def fetch(url): ...
 ```bash
 agent-tracer tree traces.jsonl
 agent-tracer stats traces.jsonl
+agent-tracer dashboard traces.jsonl report.html
 ```
 
 ## Roadmap
