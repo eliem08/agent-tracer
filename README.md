@@ -50,6 +50,7 @@ To sell self-serve, set four variables and point a Stripe webhook at `https://<y
 | `STRIPE_WEBHOOK_SECRET` | `whsec_...` |
 | `STRIPE_PRICES` | `team=price_123,business=price_456` |
 | `PUBLIC_URL` | `https://agent-tracer.example.com` |
+| `PLAN_QUOTAS` (optional) | `team=10000,business=250000` successful calls per key per month |
 
 Buyers pick a plan on `/pricing`, pay on Stripe Checkout and see their API key once on the success page. Cancelling the subscription revokes the key. A selling server always requires a key.
 
@@ -65,8 +66,9 @@ Monthly plans start with a 14-day free trial. Prices in USD, billed monthly unle
 
 To start a trial or buy a plan, [request access](https://github.com/eliem08/agent-tracer/issues/new?title=Agent%20Tracer%20trial&labels=sales).
 
-Plan note: every plan runs the same software, and every API key unlocks all of it. Seat, agent and volume
-limits are licence terms; the code does not enforce them. Support, SLA and done-for-you items are services.
+Plan note: every plan runs the same software, and every API key unlocks all of it. Monthly call volumes are
+enforced when `PLAN_QUOTAS` is set (see Deploy and sell); seat and agent limits are licence terms the code does
+not enforce. Support, SLA and done-for-you items are services.
 
 ## Licence
 
