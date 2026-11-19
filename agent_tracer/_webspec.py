@@ -116,7 +116,13 @@ SPEC = {
             "key": "team",
             "name": "Team",
             "price": "$99 per month",
-            "features": ["10 developers", "Cost and error statistics", "OpenTelemetry import", "JSON export"],
+            "features": [
+                "10 developers",
+                "HTML dashboard",
+                "Cost and error statistics",
+                "OpenTelemetry import",
+                "JSON export",
+            ],
         },
         {
             "key": "business",
